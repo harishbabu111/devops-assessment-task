@@ -1,0 +1,29 @@
+- name: Deploy Static Website and Configure NGINX
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Copy NGINX config
+      copy:
+        src: ../nginx/default.conf
+        dest: /etc/nginx/sites-available/default
+        backup: yes
+
+    - name: Copy application files
+      copy:
+        src: ../app/
+        dest: /var/www/html/
+        mode: '0755'
+        owner: www-data
+        group: www-data
+
+    - name: Restart NGINX
+      service:
+        name: nginx
+        state: restarted
