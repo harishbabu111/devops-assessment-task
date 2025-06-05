@@ -1,7 +1,6 @@
-- name: Deploy Static Website and Configure NGINX
-  hosts: web
-  become: yes
-
+- name: Setup Server 1 with Static NGINX
+  hosts: server1
+  become: true
   tasks:
     - name: Install NGINX
       apt:
@@ -9,21 +8,72 @@
         state: present
         update_cache: yes
 
-    - name: Copy NGINX config
+    - name: Copy custom NGINX config
       copy:
-        src: ../nginx/default.conf
+        src: ../nginx/default
         dest: /etc/nginx/sites-available/default
-        backup: yes
 
-    - name: Copy application files
+    - name: Copy index1.html
       copy:
-        src: ../app/
-        dest: /var/www/html/
-        mode: '0755'
-        owner: www-data
-        group: www-data
+        src: ../app/index1.html
+        dest: /var/www/html/index.html
 
     - name: Restart NGINX
       service:
         name: nginx
         state: restarted
+
+- name: Setup Server 2 with Docker and Proxy
+  hosts: server2
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker is started
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install NGINX for reverse proxy
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy reverse proxy config
+      copy:
+        src: ../nginx/reverse-proxy.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Create Docker app dir
+      file:
+        path: /opt/docker-app
+        state: directory
+
+    - name: Copy Dockerfile
+      copy:
+        src: ../app/Dockerfile
+        dest: /opt/docker-app/Dockerfile
+
+    - name: Copy index2.html
+      copy:
+        src: ../app/index2.html
+        dest: /opt/docker-app/index.html
+
+    - name: Build Docker image
+      command: docker build -t custom-nginx-app .
+      args:
+        chdir: /opt/docker-app
+
+    - name: Run Docker container
+      shell: docker run -d --name nginx-app -p 80:80 custom-nginx-app || true
+
+    - name: Restart NGINX
+      service:
+        name: nginx
+        state: restarted
+

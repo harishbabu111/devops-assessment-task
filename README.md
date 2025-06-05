@@ -1,13 +1,35 @@
-# DevOps Assessment Task
 
-This project demonstrates a CI/CD pipeline using GitHub Actions, EC2 deployment via Ansible, and NGINX as a reverse proxy to serve a static website.
+This project demonstrates a CI/CD pipeline using **GitHub Actions**, **Ansible**, **Docker**, and **NGINX** to deploy apps on two EC2 servers.
 
-## Tech Stack
+---
 
-- **GitHub Actions**: CI/CD automation
-- **Ansible**: Provisioning and deployment
-- **NGINX**: Web server and reverse proxy
-- **EC2 (Ubuntu)**: Hosting environment
+## 🌐 Architecture
 
-## Project Structure
+- **Server 1 (Static App)**:
+  - NGINX serving static HTML page
+  - Provisioned using Ansible
 
+- **Server 2 (Docker App)**:
+  - Docker running NGINX container
+  - Reverse proxy using host NGINX
+  - Provisioned using Ansible
+
+---
+
+## 📁 Project Structure
+
+devops-assessment-task/
+├── .github/workflows/ci-cd.yml
+├── ansible/
+│ ├── inventory
+│ └── playbook.yml
+├── app/
+│ ├── index1.html
+│ ├── index2.html
+│ └── Dockerfile
+├── nginx/
+│ ├── default
+│ └── reverse-proxy.conf
+├── scripts/
+│ └── deploy.sh
+└── README.md

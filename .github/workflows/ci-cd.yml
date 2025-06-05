@@ -1,4 +1,3 @@
-name: CI/CD Pipeline
 
 on:
   push:
@@ -7,24 +6,26 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2 with Ansible
+    name: Ansible Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Set up Python for Ansible
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - name: Install Ansible
         run: |
-          sudo apt update
-          sudo apt install ansible -y
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          sudo apt-get update
+          sudo apt-get install -y ansible sshpass
 
       - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
         run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i ansible/inventory ansible/playbook.yml
+
