@@ -24,8 +24,7 @@ jobs:
           sudo apt-get install -y ansible sshpass
 
       - name: Run Ansible Playbook
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'False'
         run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i ansible/inventory ansible/playbook.yml
 
