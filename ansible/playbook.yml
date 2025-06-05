@@ -70,7 +70,7 @@
         chdir: /opt/docker-app
 
     - name: Run Docker container
-      shell: sudo docker run -d --name nginx-app -p 80:80 custom-nginx-app || true
+      shell: sudo docker run -d --name nginx-app -p 8080:80 custom-nginx-app || true
 
     - name: Restart NGINX
       service:
