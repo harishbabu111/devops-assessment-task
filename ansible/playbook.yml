@@ -69,8 +69,11 @@
       args:
         chdir: /opt/docker-app
 
+    - name: Remove existing container if present
+      shell: sudo docker rm -f nginx-app || true
+
     - name: Run Docker container
-      shell: sudo docker run -d --name nginx-app -p 8080:80 custom-nginx-app || true
+      shell: sudo docker run -d --name nginx-app -p 8080:80 custom-nginx-app
 
     - name: Restart NGINX
       service:
