@@ -7,14 +7,13 @@ on:
 
 jobs:
   deploy:
-    name: Ansible Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python and Ansible
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -24,12 +23,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible sshpass
 
-      - name: Add SSH key
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 13.235.86.35 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 13.235.74.58 >> ~/.ssh/known_hosts
 
       - name: Run Ansible Playbook
         env:
