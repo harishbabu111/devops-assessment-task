@@ -1,9 +1,3 @@
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   deploy:
     name: Ansible Deploy to EC2
@@ -13,7 +7,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python for Ansible
+      - name: Set up Python and Ansible
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -23,8 +17,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible sshpass
 
-      - name: Run Ansible Playbook
+      - name: Add SSH key
         run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i ansible/inventory ansible/playbook.yml
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 13.235.86.35 >> ~/.ssh/known_hosts
 
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
+        run: |
+          ansible-playbook -i ansible/inventory ansible/playbook.yml
